@@ -1,6 +1,7 @@
 package com.enesuzun.ibb_ecodation_javafx.dao;
 
 import com.enesuzun.ibb_ecodation_javafx.database.SingletonDBConnection;
+import com.enesuzun.ibb_ecodation_javafx.dto.UserDTO;
 
 import java.sql.Connection;
 import java.util.List;
@@ -10,7 +11,7 @@ public interface IDaoImplements <T> {
     //create
     Optional<T> create(T entity);
     //LİST
-    List<T> list();
+    Optional<List<T>> list();
     //findBy
     Optional<T> findByName(String name);
     Optional<T> findById(int id);
