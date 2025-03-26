@@ -7,6 +7,9 @@ import java.util.Optional;
 
 public class UserDAO implements IDaoImplements<UserDTO>{
 
+    //Fields
+
+
     @Override
     public Optional<UserDTO> create(UserDTO entity) {
         return Optional.empty();
