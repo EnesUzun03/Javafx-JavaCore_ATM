@@ -1,4 +1,5 @@
 // Gerekli izinleri verdiğimiz yer
+/*
 module com.enesuzun.ibb_ecodation_javafx {
 
     // JavaFX'in temel bileşenlerini kullanmak için gerekli modüller
@@ -71,12 +72,8 @@ module com.enesuzun.ibb_ecodation_javafx {
     // Ana paketi dış dünyaya açıyoruz. Diğer modüller bu paketin içeriğini kullanabilir.
     exports com.enesuzun.ibb_ecodation_javafx;
 }
+*/
 
-
-
-
-
-/*
 module com.enesuzun.ibb_ecodation_javafx {
     requires javafx.controls;
     requires javafx.fxml;
@@ -87,8 +84,10 @@ module com.enesuzun.ibb_ecodation_javafx {
     requires net.synedra.validatorfx;
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.bootstrapfx.core;
+    requires java.sql;
+    requires static lombok;
     //requires eu.hansolo.tilesfx;
 
     opens com.enesuzun.ibb_ecodation_javafx to javafx.fxml;
     exports com.enesuzun.ibb_ecodation_javafx;
-}*/
+}

@@ -1,5 +1,7 @@
 package com.enesuzun.ibb_ecodation_javafx.dao;
 
+import com.enesuzun.ibb_ecodation_javafx.database.SingletonDBConnection;
+
 import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +23,7 @@ public interface IDaoImplements <T> {
     //gövdeli metot yazılacak(Java 8 ile geliyor
 
     default Connection iDaoImplementsDatabaseConnection(){
-        return null;
+        return SingletonDBConnection.getInstance().getConnection();
     }
 
 }
