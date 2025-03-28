@@ -1,5 +1,8 @@
 package com.enesuzun.ibb_ecodation_javafx.dto;
-
+/// DTO (Data Transfer Object)
+/// Açılımı: Data Transfer Object
+/// Tanım: Bir uygulama içinde veya farklı sistemler arasında veri taşımak için kullanılan nesnelerdir. DTO’lar sadece veri taşır; herhangi bir iş mantığı içermez.
+/// Kullanım Amacı: Veritabanı veya API'den alınan verileri UI veya iş katmanına aktarmak için kullanılır.
 import lombok.*;
 
 //LOMBOK

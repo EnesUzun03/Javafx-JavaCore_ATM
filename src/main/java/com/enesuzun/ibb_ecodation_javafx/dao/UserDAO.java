@@ -11,9 +11,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/// DAO (Data Access Object)
+/// Açılımı: Data Access Object
+/// Tanım: Veritabanı işlemlerini gerçekleştiren bir tasarım desenidir. CRUD (Create, Read, Update, Delete) işlemlerini soyutlamak için kullanılır.
+/// Kullanım Amacı: İş mantığı ve veri erişim işlemlerini birbirinden ayırarak kodun daha okunabilir ve yönetilebilir olmasını sağlar.
+
+/*
+* ResultSet, Java'nın JDBC (Java Database Connectivity) API'sinde
+* kullanılan ve bir veritabanı sorgusunun sonuçlarını temsil eden bir arayüzdür.
+* SELECT sorgularından dönen sonuçları işlerken kullanılır.
+* */
+
 /*
 * PreparedStatement Java'nın JDBC (Java Database Connectivity) API'sinde kullanılan
-* bir arayüzdür ve veritabanı işlemlerini
+* bir arayüzdür ve veritabanı işlemlerini gerçekleştirmeyi sağlar.
+* Temel amacı SQL enjeksiyonu riskini azaltmak ve tekrar eden sorguların performansını iyileştirmektir.
 * */
 
 public class UserDAO implements IDaoImplements<UserDTO>{
@@ -87,51 +99,19 @@ public class UserDAO implements IDaoImplements<UserDTO>{
         //Eğer ekleme basarızsızsa boş veri döndür
         return Optional.empty();
     }
-    ///Find by name
+    ///Find by id
     @Override
     public Optional<UserDTO> findById(int id) {
         String sql="SELECT * FROM users WHERE id=?";
-        try(PreparedStatement preparedStatement=connection.prepareStatement(sql)) {
-            preparedStatement.setInt(1,id);
-            ResultSet resultSet=preparedStatement.executeQuery(sql);//sorgu atmak için gereklidir
-            if(resultSet.next()){//vtden gelen veri varsa
-                UserDTO userDTO=UserDTO.builder()
-                        .id(resultSet.getInt("id"))
-                        .userName(resultSet.getString("username"))
-                        .email(resultSet.getString("email"))
-                        .password(resultSet.getString("password"))
-                        .build();
-                return Optional.of(userDTO);
-            }
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-        //bulunamazsa boş döndür
-        System.out.println("Aranan data bulunamadı");
-        return Optional.empty();
+        return selectSingle(sql,id);
     }
+
     /// Find by name
     @Override
     public Optional<UserDTO> findByName(String name) {
         //String sql="SELECT * FROM users WHERE username=?";
         String sql="SELECT * FROM users WHERE email=?";
-        try(PreparedStatement preparedStatement=connection.prepareStatement(sql)) {
-            preparedStatement.setString(1,name);
-            ResultSet resultSet=preparedStatement.executeQuery(sql);//sorgu atmak için gereklidir
-            if(resultSet.next()){//vtden gelen veri varsa
-                UserDTO userDTO=UserDTO.builder()
-                        .id(resultSet.getInt("id"))
-                        .userName(resultSet.getString("username"))
-                        .email(resultSet.getString("email"))
-                        .password(resultSet.getString("password"))
-                        .build();
-                return Optional.of(userDTO);
-            }
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-        //bulunamazsa boş döndür
-        return Optional.empty();
+        return selectSingle(sql,name);
     }
     ///UPDATE
     @Override
@@ -145,7 +125,7 @@ public class UserDAO implements IDaoImplements<UserDTO>{
                 preparedStatement.setString(1, userDTO.getUserName());
                 preparedStatement.setString(2, userDTO.getPassword());
                 preparedStatement.setString(3, userDTO.getEmail());
-                preparedStatement.setInt(4, userDTO.getId());//creatten farklı olarak burada id de güncelleniyor
+                preparedStatement.setInt(4, id);//creatten farklı olarak burada id de güncelleniyor
 
                 //create , delete, update işlemlerinde executeUpdate yapılması gereklidir
                 int affectedRows/*etkilenen satır*/ = preparedStatement.executeUpdate();
@@ -184,4 +164,38 @@ public class UserDAO implements IDaoImplements<UserDTO>{
         //eğer silinecek olan yoksa boş döndür
         return Optional.empty();
     }
+
+    /// ////////////////////////////////////////////////////////////////////////////////
+    //generics metot (list,find)
+    //resultSet'ten userDTO oluşturmayı tek bir yardımcı metot ile bu şekilde yapacağız
+    @Override
+    UserDTO mapToObjectDTO(ResultSet resultSet) throws SQLException{
+        return UserDTO.builder()
+                .id(resultSet.getInt("id"))
+                .userName(resultSet.getString("username"))
+                .password(resultSet.getString("password"))
+                .email(resultSet.getString("email"))
+                .build();
+    }
+
+    //dizi elemanları gelebilir( değişken , birden fazla olabilir )
+    //ID VEYA NAME ile veri çekilince bu ortak metot kullanılacak
+    //generics ile tek kayıt döndüren metot
+    @Override
+    public Optional<UserDTO> selectSingle(String sql, Object... params) {
+        try(PreparedStatement preparedStatement=connection.prepareStatement(sql)) {
+            for (int i = 0; i < params.length; i++) {//kaç tane varsa o kadar güncelleyecek
+                preparedStatement.setObject((i+1),params[i]);
+            }
+            try(ResultSet resultSet=preparedStatement.executeQuery()){
+                if(resultSet.next()){
+                    return Optional.of(mapToObjectDTO(resultSet));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    }
+    /// ////////////////////////////////////////////////////////////////////////////////
 }
