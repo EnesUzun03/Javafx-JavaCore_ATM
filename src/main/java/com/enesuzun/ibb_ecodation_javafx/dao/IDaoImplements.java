@@ -5,10 +5,17 @@ import com.enesuzun.ibb_ecodation_javafx.dto.UserDTO;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-public interface IDaoImplements <T> {
+
+///
+/// Burada interface'i başka bir interface'e implemente etmek için extends kullanılır
+/// (Tahminimce aynı tür oldukları için bu keywords seçilmiştir)
+///
+
+public interface IDaoImplements <T> extends ILogin {
     //create
     Optional<T> create(T entity);
     //LİST
@@ -22,17 +29,7 @@ public interface IDaoImplements <T> {
     //DELETE
     Optional<T> delete(int id);
 
-    /// /////////////////////////////////////////////////////////
-    //generics metot (list,find)
-    //resultSet'ten userDTO oluşturmayı tek bir yardımcı metot ile bu şekilde yapacağız
-    T mapToObjectDTO(ResultSet resultSet);
 
-    //dizi elemanları gelebilir( değişken , birden fazla olabilir )
-    //ID VEYA NAME ile veri çekilince bu ortak metot kullanılacak
-    //generics ile tek kayıt döndüren metot
-    Optional<T> selectSingle(String sql,Object... params);
-
-    /// ///////////////////////////////////////////////////////
     //gövdeli metot yazılacak(Java 8 ile geliyor
 
     default Connection iDaoImplementsDatabaseConnection(){

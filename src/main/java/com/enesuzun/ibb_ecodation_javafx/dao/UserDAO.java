@@ -28,13 +28,14 @@ import java.util.Optional;
 * Temel amacı SQL enjeksiyonu riskini azaltmak ve tekrar eden sorguların performansını iyileştirmektir.
 * */
 
-public class UserDAO implements IDaoImplements<UserDTO>{
+public class UserDAO implements IDaoImplements<UserDTO>, IGenericsMethod{
 
     //Fields
     private Connection connection;//database ile bağlantı sağlar
 
     //Parametresiz constructer
     public UserDAO() {
+        //default degerler
         this.connection= SingletonDBConnection.getInstance().getConnection();
     }
 
@@ -169,7 +170,7 @@ public class UserDAO implements IDaoImplements<UserDTO>{
     //generics metot (list,find)
     //resultSet'ten userDTO oluşturmayı tek bir yardımcı metot ile bu şekilde yapacağız
     @Override
-    UserDTO mapToObjectDTO(ResultSet resultSet) throws SQLException{
+    public UserDTO mapToObjectDTO(ResultSet resultSet) throws SQLException{
         return UserDTO.builder()
                 .id(resultSet.getInt("id"))
                 .userName(resultSet.getString("username"))
@@ -197,5 +198,13 @@ public class UserDAO implements IDaoImplements<UserDTO>{
         }
         return Optional.empty();
     }
+
     /// ////////////////////////////////////////////////////////////////////////////////
+    /// LOGİN (ILogin interfacinden gelmektedir)
+    @Override
+    public Optional loginUser(String userName, String password) {
+        //her zamanki gbi once login var mı onun kontrolü yapılır var ise girilir yoksa registera yönlendircez
+        String sql="SELECT * FROM users WHERE username=?, AND password=?";
+        return selectSingle(sql,userName,password);
+    }
 }
