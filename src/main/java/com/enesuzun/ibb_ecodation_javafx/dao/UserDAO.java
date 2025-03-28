@@ -28,7 +28,7 @@ import java.util.Optional;
 * Temel amacı SQL enjeksiyonu riskini azaltmak ve tekrar eden sorguların performansını iyileştirmektir.
 * */
 
-public class UserDAO implements IDaoImplements<UserDTO>, IGenericsMethod{
+public class UserDAO implements IDaoImplements<UserDTO>{
 
     //Fields
     private Connection connection;//database ile bağlantı sağlar

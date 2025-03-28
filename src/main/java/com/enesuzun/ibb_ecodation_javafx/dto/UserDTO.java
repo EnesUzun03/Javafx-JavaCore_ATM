@@ -16,7 +16,6 @@ import lombok.*;
 @ToString
 @Builder
 
-
 //UserDTO
 public class UserDTO {
     //Fields

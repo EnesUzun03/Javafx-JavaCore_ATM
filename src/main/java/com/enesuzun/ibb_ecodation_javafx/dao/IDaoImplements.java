@@ -15,23 +15,9 @@ import java.util.Optional;
 /// (Tahminimce aynı tür oldukları için bu keywords seçilmiştir)
 ///
 
-public interface IDaoImplements <T> extends ILogin {
-    //create
-    Optional<T> create(T entity);
-    //LİST
-    Optional<List<T>> list();
-    //findBy
-    Optional<T> findByName(String name);
-    Optional<T> findById(int id);
-
-    //Update
-    Optional<T> update(int id, T entity);
-    //DELETE
-    Optional<T> delete(int id);
-
+public interface IDaoImplements <T> extends ICrud<T> , ILogin<T> , IGenericsMethod<T>{
 
     //gövdeli metot yazılacak(Java 8 ile geliyor
-
     default Connection iDaoImplementsDatabaseConnection(){
         return SingletonDBConnection.getInstance().getConnection();
     }
