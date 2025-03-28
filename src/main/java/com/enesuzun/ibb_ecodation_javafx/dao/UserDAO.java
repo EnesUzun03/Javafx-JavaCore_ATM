@@ -110,10 +110,11 @@ public class UserDAO implements IDaoImplements<UserDTO>{
         System.out.println("Aranan data bulunamadı");
         return Optional.empty();
     }
-    /// Find by id
+    /// Find by name
     @Override
     public Optional<UserDTO> findByName(String name) {
-        String sql="SELECT * FROM users WHERE username=?";
+        //String sql="SELECT * FROM users WHERE username=?";
+        String sql="SELECT * FROM users WHERE email=?";
         try(PreparedStatement preparedStatement=connection.prepareStatement(sql)) {
             preparedStatement.setString(1,name);
             ResultSet resultSet=preparedStatement.executeQuery(sql);//sorgu atmak için gereklidir
