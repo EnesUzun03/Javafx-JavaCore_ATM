@@ -3,6 +3,7 @@ package com.enesuzun.ibb_ecodation_javafx.dto;
 /// Açılımı: Data Transfer Object
 /// Tanım: Bir uygulama içinde veya farklı sistemler arasında veri taşımak için kullanılan nesnelerdir. DTO’lar sadece veri taşır; herhangi bir iş mantığı içermez.
 /// Kullanım Amacı: Veritabanı veya API'den alınan verileri UI veya iş katmanına aktarmak için kullanılır.
+import com.enesuzun.ibb_ecodation_javafx.utils.ERole;
 import lombok.*;
 
 //LOMBOK
@@ -23,11 +24,13 @@ public class UserDTO {
     private String userName;
     private String password;
     private String email;
+    private ERole role;
 
-    public UserDTO(int id, String userName, String password, String email) {
+    public UserDTO(int id, String userName, String password, String email,ERole eRole) {
         this.id = id;
         this.userName = userName;
         this.password = password;
         this.email = email;
+        this.role=eRole;
     }
 }//END CLASS

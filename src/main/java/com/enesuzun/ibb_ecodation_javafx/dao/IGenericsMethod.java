@@ -13,7 +13,7 @@ public interface IGenericsMethod<T> {
     //dizi elemanları gelebilir( değişken , birden fazla olabilir )
     //ID VEYA NAME ile veri çekilince bu ortak metot kullanılacak
     //generics ile tek kayıt döndüren metot
-    Optional<T> selectSingle(String sql, Object... params);
+    public Optional<T> selectSingle(String sql, Object... params);
 
     /// ///////////////////////////////////////////////////////
 }

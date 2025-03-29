@@ -1,6 +1,7 @@
 package com.enesuzun.ibb_ecodation_javafx.dao;
 
 import com.enesuzun.ibb_ecodation_javafx.database.SingletonDBConnection;
+import com.enesuzun.ibb_ecodation_javafx.database.SingletonPropertiesDBConnection;
 import com.enesuzun.ibb_ecodation_javafx.dto.UserDTO;
 
 import java.sql.Connection;
@@ -19,7 +20,11 @@ public interface IDaoImplements <T> extends ICrud<T> , ILogin<T> , IGenericsMeth
 
     //gövdeli metot yazılacak(Java 8 ile geliyor
     default Connection iDaoImplementsDatabaseConnection(){
-        return SingletonDBConnection.getInstance().getConnection();
+        //return SingletonDBConnection.getInstance().getConnection();
+
+        // Singleton Config
+        return SingletonPropertiesDBConnection.getInstance().getConnection();
+
     }
 
 }

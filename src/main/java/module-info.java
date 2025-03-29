@@ -38,6 +38,7 @@ module com.enesuzun.ibb_ecodation_javafx {
     requires java.sql;
     requires org.apache.poi.poi;
     requires java.desktop;
+    requires jbcrypt;
     //requires eu.hansolo.tilesfx;
 
     // #######################################################################################
@@ -70,5 +71,6 @@ module com.enesuzun.ibb_ecodation_javafx {
 
     // Ana paketi dış dünyaya açıyoruz. Diğer modüller bu paketin içeriğini kullanabilir.
     exports com.enesuzun.ibb_ecodation_javafx;
+    opens com.enesuzun.ibb_ecodation_javafx.utils to javafx.base, lombok;
 
 }

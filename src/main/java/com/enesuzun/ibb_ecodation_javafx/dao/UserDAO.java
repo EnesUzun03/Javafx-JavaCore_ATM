@@ -1,7 +1,10 @@
 package com.enesuzun.ibb_ecodation_javafx.dao;
 
 import com.enesuzun.ibb_ecodation_javafx.database.SingletonDBConnection;
+import com.enesuzun.ibb_ecodation_javafx.database.SingletonPropertiesDBConnection;
 import com.enesuzun.ibb_ecodation_javafx.dto.UserDTO;
+import com.enesuzun.ibb_ecodation_javafx.utils.ERole;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -36,7 +39,7 @@ public class UserDAO implements IDaoImplements<UserDTO>{
     //Parametresiz constructer
     public UserDAO() {
         //default degerler
-        this.connection= SingletonDBConnection.getInstance().getConnection();
+        this.connection= SingletonPropertiesDBConnection.getInstance().getConnection();
     }
 
 
@@ -46,11 +49,17 @@ public class UserDAO implements IDaoImplements<UserDTO>{
     ///Create
     @Override
     public Optional<UserDTO> create(UserDTO userDTO) {
-        String sql="INSERT INTO users (username,password,email) VALUES(?,?,?)";
+        //HASH password
+        String hashedPassword= BCrypt.hashpw(userDTO.getPassword(),BCrypt.gensalt());
+
+
+        //SQL
+        String sql="INSERT INTO usertable (username,password,email,role) VALUES(?,?,?,?)";
         try(PreparedStatement preparedStatement=connection.prepareStatement(sql)){
             preparedStatement.setString(1,userDTO.getUserName());
             preparedStatement.setString(2,userDTO.getPassword());
             preparedStatement.setString( 3,userDTO.getEmail());
+            preparedStatement.setString( 4,userDTO.getRole().name());
             //create , delete, update işlemlerinde executeUpdate yapılması gereklidir
             int affectedRows =  preparedStatement.executeUpdate();
 
@@ -59,6 +68,7 @@ public class UserDAO implements IDaoImplements<UserDTO>{
                 try(ResultSet generatedKeys = preparedStatement.getGeneratedKeys()){//ResultSet databaseden dönüt almak içindir
                     if(generatedKeys.next()){
                         userDTO.setId(generatedKeys.getInt(1));//otomatik ıd set ediyoruz
+                        userDTO.setPassword(hashedPassword);
                         return Optional.of(userDTO);
                     }
                 } catch (SQLException sqlException) {
@@ -75,7 +85,7 @@ public class UserDAO implements IDaoImplements<UserDTO>{
     @Override
     public Optional<List<UserDTO>> list() {
         List<UserDTO> userDTOList =new ArrayList<>();
-        String sql="SELECT * FROM users";
+        String sql="SELECT * FROM usertable";
         try(PreparedStatement preparedStatement=connection.prepareStatement(sql)) {
 
             //ResultSet databaseden dönen verileri almak için kullanılan yapılardır
@@ -84,13 +94,7 @@ public class UserDAO implements IDaoImplements<UserDTO>{
             //veritabanından gelen verileri almak
 
             while (resultSet.next()){
-                userDTOList.add(UserDTO.builder()
-                                .id(resultSet.getInt("id"))
-                                .userName(resultSet.getString("username"))
-                                .password(resultSet.getString("password"))
-                                .email(resultSet.getString("email"))
-                        .build()
-                );
+                userDTOList.add(mapToObjectDTO(resultSet));
             }
             return userDTOList.isEmpty()? Optional.empty() :Optional.of(userDTOList);
 
@@ -103,30 +107,34 @@ public class UserDAO implements IDaoImplements<UserDTO>{
     ///Find by id
     @Override
     public Optional<UserDTO> findById(int id) {
-        String sql="SELECT * FROM users WHERE id=?";
+        String sql="SELECT * FROM usertable WHERE id=?";
         return selectSingle(sql,id);
     }
 
     /// Find by name
     @Override
     public Optional<UserDTO> findByName(String name) {
-        //String sql="SELECT * FROM users WHERE username=?";
-        String sql="SELECT * FROM users WHERE email=?";
+        //String sql="SELECT * FROM usertable WHERE username=?";
+        String sql="SELECT * FROM usertable WHERE email=?";
         return selectSingle(sql,name);
     }
     ///UPDATE
     @Override
     public Optional<UserDTO> update(int id, UserDTO userDTO) {
+        //önce id olan nesne bulunur
         Optional<UserDTO> optionalDelete=findById(id);
         if(optionalDelete.isPresent()) {//Veri varsa 1
-
+            //HASH password
+            String hashedPassword= BCrypt.hashpw(userDTO.getPassword(),BCrypt.gensalt());
             //update yapılacaksa önce bulunmalı sonra verilen degerlerle değiştirilemli
-            String sql = "UPDATE users SET username=?,password=?,email=? WHERE id=?";//sadece aranan ıd güncellensin diye where id yazdık
+            //SQL
+            String sql = "UPDATE usertable SET username=?,password=?,email=?,role=? WHERE id=?";//sadece aranan ıd güncellensin diye where id yazdık
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                 preparedStatement.setString(1, userDTO.getUserName());
                 preparedStatement.setString(2, userDTO.getPassword());
                 preparedStatement.setString(3, userDTO.getEmail());
-                preparedStatement.setInt(4, id);//creatten farklı olarak burada id de güncelleniyor
+                preparedStatement.setString(4, userDTO.getRole().name());
+                preparedStatement.setInt(5, id);//creatten farklı olarak burada id de güncelleniyor
 
                 //create , delete, update işlemlerinde executeUpdate yapılması gereklidir
                 int affectedRows/*etkilenen satır*/ = preparedStatement.executeUpdate();
@@ -134,6 +142,7 @@ public class UserDAO implements IDaoImplements<UserDTO>{
                 //Eğer Güncelleme başarılı ise
                 if (affectedRows > 0) {
                     userDTO.setId(id);//güncellenen userDTO için id'yi ekle
+                    userDTO.setPassword(hashedPassword);
                     return Optional.of(userDTO);
                 }
             } catch (Exception e) {
@@ -148,7 +157,7 @@ public class UserDAO implements IDaoImplements<UserDTO>{
         //silinecek olan once bulunur sonra silinir
         Optional<UserDTO> optionalDelete=findById(id);
         if(optionalDelete.isPresent()){//Veri varsa 1
-            String sql="DELETE users WHERE id=?";//sadece SİLMEK istediğimiz id yapısıdır
+            String sql="DELETE usertable WHERE id=?";//sadece SİLMEK istediğimiz id yapısıdır
             try(PreparedStatement preparedStatement=connection.prepareStatement(sql)) {
                 preparedStatement.setInt(1,id);
 
@@ -176,6 +185,7 @@ public class UserDAO implements IDaoImplements<UserDTO>{
                 .userName(resultSet.getString("username"))
                 .password(resultSet.getString("password"))
                 .email(resultSet.getString("email"))
+                .role(ERole.fromString(resultSet.getString("role")))
                 .build();
     }
 
@@ -204,7 +214,53 @@ public class UserDAO implements IDaoImplements<UserDTO>{
     @Override
     public Optional loginUser(String userName, String password) {
         //her zamanki gbi once login var mı onun kontrolü yapılır var ise girilir yoksa registera yönlendircez
-        String sql="SELECT * FROM users WHERE username=?, AND password=?";
-        return selectSingle(sql,userName,password);
+        String sql="SELECT * FROM usertable WHERE username=?, AND password=?";
+        //veri güvenliği salamalıyız
+        Optional<UserDTO> userOptional =selectSingle(sql,userName,password);
+        if(userOptional.isPresent()){
+            UserDTO userDTO=userOptional.get();
+            if(BCrypt.checkpw(password,userDTO.getPassword())){
+                return Optional.of(userDTO);
+            }
+        }
+        return Optional.empty();
     }
+
+    //VT USERNAME VAR MI?
+    public boolean isUsernameExists(String username){
+        String sql ="SELECT 1 FROM usertable WHERE username=?";
+        try(PreparedStatement ps=connection.prepareStatement(sql)){
+            ps.setString(1,username);
+            ResultSet rs=ps.executeQuery();
+            return rs.next();//kayıt
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return true;//hata varsa güvenlik için 1 föndür
+        }
+    }
+
+    //VT E-mail VAR MI?
+    public boolean isEmailExists(String email){
+        String sql ="SELECT 1 FROM usertable WHERE email=?";
+        try(PreparedStatement ps=connection.prepareStatement(sql)){
+            ps.setString(1,email);
+            ResultSet rs=ps.executeQuery();
+            return rs.next();//kayıt
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return true;//hata varsa güvenlik için 1 föndür
+        }
+    }
+
+
+
+
+
+
+
+
+
+
 }
