@@ -68,9 +68,9 @@ public class LoginController  {
         password = passwordField.getText();
 
         //optionalUserDTO VT'ye  eklenecek
-        Optional<UserDTO> optionalUserDTO=userDAO.loginUser(username,password);
-        if(optionalUserDTO.isPresent()){//eğer veri boş değilse 1
-            UserDTO userDTO=optionalUserDTO.get();//Veri alınır
+        Optional<UserDTO> optionalLoginUserDTO=userDAO.loginUser(username,password);
+        if(optionalLoginUserDTO.isPresent()){//eğer veri boş değilse 1
+            UserDTO userDTO=optionalLoginUserDTO.get();//Veri alınır
 
             //Eger bağarılı ise toast mesaji göster
             showAlert("Başarılı","Giriş başarılı",Alert.AlertType.INFORMATION);
@@ -117,7 +117,7 @@ public class LoginController  {
     private void switchToRegister() {
         try {
             // FXML Dosyalarını Yükle (Kayıt ekranının FXML dosyasını yüklüyoruz)
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/enesuzun/ibb_ecodation_javafx/view/login.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/enesuzun/ibb_ecodation_javafx/view/register.fxml"));
             Parent parent = fxmlLoader.load();
 
             // Var olan sahneyi alıp ve değiştirmek
