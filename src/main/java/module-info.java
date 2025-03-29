@@ -50,7 +50,7 @@ module com.enesuzun.ibb_ecodation_javafx {
     opens com.enesuzun.ibb_ecodation_javafx.dto to javafx.base, lombok;
 
     // Controller sınıfları FXML tarafından kullanılacağı için açılması gerekiyor.
-    //opens com.enesuzun.ibb_ecodation_javafx.controller to javafx.fxml;
+    opens com.enesuzun.ibb_ecodation_javafx.controller to javafx.fxml;
 
     // DAO (Data Access Object) sınıfları, SQL bağlantısı kullandığı için açılıyor.
     opens com.enesuzun.ibb_ecodation_javafx.dao to java.sql;
@@ -70,4 +70,5 @@ module com.enesuzun.ibb_ecodation_javafx {
 
     // Ana paketi dış dünyaya açıyoruz. Diğer modüller bu paketin içeriğini kullanabilir.
     exports com.enesuzun.ibb_ecodation_javafx;
+
 }
